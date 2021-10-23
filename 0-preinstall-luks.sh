@@ -120,5 +120,5 @@ EOF
 cp -R ~/ArchTitus /mnt/root/
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 echo "--------------------------------------"
-echo "--   SYSTEM READY FOR 0-setup       --"
+echo "--   SYSTEM READY FOR 1S-setup       --"
 echo "--------------------------------------"
