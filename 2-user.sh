@@ -47,6 +47,8 @@ PKGS=(
 'ttf-roboto'
 #'zoom' # video conferences
 'snap-pac'
+'timeshift' #btrfs snapshot tool
+'timeshift-autosnap'
 )
 
 for PKG in "${PKGS[@]}"; do
