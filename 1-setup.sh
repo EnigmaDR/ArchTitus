@@ -36,6 +36,8 @@ echo "-------------------------------------------------"
 #read TZ
 
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+sed -i 's/^#nb_NO.UTF-8 UTF-8/nb_NO.UTF-8 UTF-8/' /etc/locale.gen
+
 locale-gen
 timedatectl --no-ask-password set-timezone Europe/Oslo
 timedatectl --no-ask-password set-ntp 1
