@@ -1,4 +1,4 @@
-# ArchTitus Installer Script
+# ArchPæt Installer Script
 
 <img src="https://i.imgur.com/YiNMnan.png" />
 
