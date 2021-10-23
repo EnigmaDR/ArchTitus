@@ -78,13 +78,24 @@ mount -t btrfs "${DISK}2" /mnt
 fi
 ls /mnt | xargs btrfs subvolume delete
 btrfs subvolume create /mnt/@
+btrfs su cr /mnt/@home
+btrfs su cr /mnt/@var
+btrfs su cr /mnt/@opt
+btrfs su cr /mnt/@tmp
+btrfs su cr /mnt/@.snapshots
 umount /mnt
 ;;
 esac
 
 # mount target
-mount -t btrfs -o subvol=@ -L ROOT /mnt
-mkdir /mnt/boot
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@ -L ROOT /mnt
+mkdir /mnt/{boot,home,var,opt,tmp,.snapshots}
+mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@home ROOT /mnt/home
+mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt ROOT /mnt/opt
+mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp ROOT /mnt/tmp
+mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots ROOT /mnt/.snapshots
+mount -o subvol=@var /dev/sda3 /mnt/var
+#mkdir /mnt/boot
 mkdir /mnt/boot/efi
 mount -t vfat -L UEFISYS /mnt/boot/
 
