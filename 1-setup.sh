@@ -40,6 +40,7 @@ sed -i 's/^#nb_NO.UTF-8 UTF-8/nb_NO.UTF-8 UTF-8/' /etc/locale.gen
 
 locale-gen
 timedatectl --no-ask-password set-timezone Europe/Oslo
+ln -sf /usr/share/zoneinfo/Europe/Oslo /etc/localtime
 timedatectl --no-ask-password set-ntp 1
 localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_COLLATE="" LC_TIME="nb_NO.UTF-8"
 
@@ -47,6 +48,7 @@ localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_COLLATE="" LC_TIME=
 #echo "Please enter your keymap: (example no or us)"
 #read KM
 localectl --no-ask-password set-keymap no
+loadkeys no-latin1
 
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
@@ -280,7 +282,7 @@ echo "username=$username" >> ${HOME}/ArchTitus/install.conf
 fi
 if [ $(whoami) = "root"  ];
 then
-    useradd -m -G wheel,libvirt -s /bin/bash $username 
+    useradd -m -G wheel,libvirt -s /bin/zsh $username 
 	passwd $username
 	cp -R /root/ArchTitus /home/$username/
     chown -R $username: /home/$username/ArchTitus
