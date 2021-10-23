@@ -90,11 +90,11 @@ esac
 # mount target
 mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@ -L ROOT /mnt
 mkdir /mnt/{boot,home,var,opt,tmp,.snapshots}
-mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@home ROOT /mnt/home
-mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt ROOT /mnt/opt
-mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp ROOT /mnt/tmp
-mount -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots ROOT /mnt/.snapshots
-mount -o subvol=@var /dev/sda3 /mnt/var
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@home ROOT /mnt/home
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt ROOT /mnt/opt
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp ROOT /mnt/tmp
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots ROOT /mnt/.snapshots
+mount -t btrfs -o subvol=@var /dev/sda3 /mnt/var
 #mkdir /mnt/boot
 mkdir /mnt/boot/efi
 mount -t vfat -L UEFISYS /mnt/boot/
