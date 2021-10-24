@@ -65,38 +65,43 @@ sgdisk -t 2:8300 ${DISK}
 sgdisk -c 1:"UEFISYS" ${DISK}
 sgdisk -c 2:"ROOT" ${DISK}
 
-# Create luks partitions
-cryptsetup luksFormat "${DISK}2"
-cryptsetup luksOpen "${DISK}2" myvolume
-pvcreate --dataalignment 1m /dev/mapper/myvolume
-vgcreate volumegroup /dev/mapper/myvolume
-lvcreate  -L 10GB myvolume -n root
-#lvcreate -l 100%FREE volumegroup -n home
-
-mkfs.btrfs -L "ROOT" /dev/myvolume/root -f
-mount -t btrfs /dev/myvolume/root /mnt
-
-
 # make filesystems
 echo -e "\nCreating Filesystems...\n$HR"
 if [[ ${DISK} =~ "nvme" ]]; then
+cryptsetup luksFormat "${DISK}p2"
+cryptsetup luksOpen "${DISK}p2" luks
 mkfs.vfat -F32 -n "UEFISYS" "${DISK}p1"
-mkfs.btrfs -L "ROOT" "${DISK}p2" -f
-mount -t btrfs "${DISK}p2" /mnt
+mkfs.btrfs -L "ROOT" /dev/mapper/luks -f
+mount -t btrfs /dev/mapper/luks /mnt
+UUID=$(blkid -s UUID -o value "${DISK}p2")
 else
+cryptsetup luksFormat "${DISK}2"
+cryptsetup luksOpen "${DISK}2" luks
 mkfs.vfat -F32 -n "UEFISYS" "${DISK}1"
-#mkfs.btrfs -L "ROOT" "${DISK}2" -f
-#mount -t btrfs "${DISK}2" /mnt
+mkfs.btrfs -L "ROOT" /dev/mapper/luks -f
+mount -t btrfs /dev/mapper/luks /mnt
+UUID=$(blkid -s UUID -o value "${DISK}2")
 fi
 ls /mnt | xargs btrfs subvolume delete
 btrfs subvolume create /mnt/@
+btrfs su cr /mnt/@home
+btrfs su cr /mnt/@var
+btrfs su cr /mnt/@opt
+btrfs su cr /mnt/@tmp
+btrfs su cr /mnt/@.snapshots
 umount /mnt
 ;;
 esac
 
 # mount target
-mount -t btrfs -o subvol=@ -L ROOT /mnt
-mkdir /mnt/boot
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@ -L ROOT /mnt
+mkdir /mnt/{boot,home,var,opt,tmp,.snapshots}
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@home -L ROOT /mnt/home
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt -L ROOT /mnt/opt
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp -L ROOT /mnt/tmp
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots -L ROOT /mnt/.snapshots
+mount -t btrfs -o subvol=@var -L ROOT /mnt/var
+#mkdir /mnt/boot
 mkdir /mnt/boot/efi
 mount -t vfat -L UEFISYS /mnt/boot/
 
@@ -114,11 +119,11 @@ bootctl install --esp-path=/mnt/boot
 cat <<EOF > /mnt/boot/loader/entries/arch.conf
 title Arch Linux  
 linux /vmlinuz-linux  
-initrd  /initramfs-linux.img  
-options root=LABEL=ROOT rw rootflags=subvol=@
+initrd  /initramfs-linux.img
+options cryptdevice=UUID="${UUID}":luks:allow-discards root=/dev/mapper/luks rootflags=subvol=@ rd.luks.options=discard rw  
 EOF
 cp -R ~/ArchTitus /mnt/root/
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 echo "--------------------------------------"
-echo "--   SYSTEM READY FOR 1S-setup       --"
+echo "--   SYSTEM READY FOR 1-setup       --"
 echo "--------------------------------------"
