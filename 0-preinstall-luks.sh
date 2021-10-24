@@ -108,7 +108,7 @@ mount -t vfat -L UEFISYS /mnt/boot/
 echo "--------------------------------------"
 echo "-- Arch Install Initramfs           --"
 echo "--------------------------------------"
-sed 's/.*HOOKS=.*/HOOKS="base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems"./' /etc/mkinitcpio.conf
+sed 's/.*HOOKS=.*/HOOKS="base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems"./' /mnt/etc/mkinitcpio.conf
 mkinitcpio -p linux #Recreate initramfs
 
 echo "--------------------------------------"
