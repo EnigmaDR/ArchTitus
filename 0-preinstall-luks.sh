@@ -111,11 +111,11 @@ echo "--------------------------------------"
 pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
 genfstab -U /mnt >> /mnt/etc/fstab
 
-echo "--------------------------------------"
-echo "-- Arch Install Initramfs           --"
-echo "--------------------------------------"
-sed 's/.*HOOKS=.*/HOOKS=(base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems)./' /mnt/etc/mkinitcpio.conf
-mkinitcpio -p linux #Recreate initramfs
+#echo "--------------------------------------"
+#echo "-- Arch Install Initramfs           --"
+#echo "--------------------------------------"
+#sed -i 's/HOOKS=.*/HOOKS=(base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems)/g' /mnt/etc/mkinitcpio.conf
+#mkinitcpio -p linux #Recreate initramfs
 
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
 echo "--------------------------------------"
