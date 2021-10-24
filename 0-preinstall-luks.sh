@@ -94,16 +94,22 @@ umount /mnt
 esac
 
 # mount target
-mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@ -L /dev/mapper/luks /mnt
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@ -L ROOT /mnt
 mkdir /mnt/{boot,home,var,opt,tmp,.snapshots}
-mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@home -L /dev/mapper/luks /mnt/home
-mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt -L /dev/mapper/luks /mnt/opt
-mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp -L /dev/mapper/luks /mnt/tmp
-mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots -L /dev/mapper/luks /mnt/.snapshots
-mount -t btrfs -o subvol=@var -L /dev/mapper/luks /mnt/var
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@home -L ROOT /mnt/home
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt -L ROOT /mnt/opt
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp -L ROOT /mnt/tmp
+mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots -L ROOT /mnt/.snapshots
+mount -t btrfs -o subvol=@var -L ROOT /mnt/var
 #mkdir /mnt/boot
 mkdir /mnt/boot/efi
 mount -t vfat -L UEFISYS /mnt/boot/
+
+echo "--------------------------------------"
+echo "-- Arch Install Initramfs           --"
+echo "--------------------------------------"
+sed 's/.*HOOKS=.*/HOOKS="base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems"./' /etc/mkinitcpio.conf
+mkinitcpio -p linux #Recreate initramfs
 
 echo "--------------------------------------"
 echo "-- Arch Install on Main Drive       --"
