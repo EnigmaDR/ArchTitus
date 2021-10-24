@@ -114,7 +114,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 echo "--------------------------------------"
 echo "-- Arch Install Initramfs           --"
 echo "--------------------------------------"
-sed 's/.*HOOKS=.*/HOOKS="base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems"./' /mnt/etc/mkinitcpio.conf
+sed 's/.*HOOKS=.*/HOOKS=(base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems)./' /mnt/etc/mkinitcpio.conf
 mkinitcpio -p linux #Recreate initramfs
 
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
