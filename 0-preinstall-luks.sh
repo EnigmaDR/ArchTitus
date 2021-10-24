@@ -120,7 +120,7 @@ cat <<EOF > /mnt/boot/loader/entries/arch.conf
 title Arch Linux  
 linux /vmlinuz-linux  
 initrd  /initramfs-linux.img
-options cryptdevice=UUID="${UUID}":luks:allow-discards root=/dev/mapper/luks rootflags=subvol=@ rd.luks.options=discard rw  
+options cryptdevice=UUID=${UUID}:luks:allow-discards root=/dev/mapper/luks rootflags=subvol=@ rd.luks.options=discard rw  
 EOF
 cp -R ~/ArchTitus /mnt/root/
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
