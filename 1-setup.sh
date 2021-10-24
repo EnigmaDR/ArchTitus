@@ -47,8 +47,9 @@ localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_COLLATE="" LC_TIME=
 # Set keymaps
 #echo "Please enter your keymap: (example no or us)"
 #read KM
-localectl --no-ask-password set-keymap no-latin1
+#localectl --no-ask-password set-keymap no-latin1
 #loadkeys no-latin1
+echo KEYMAP=no-latin1 > /etc/vconsole.conf
 
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
