@@ -20,6 +20,12 @@ pacman -S --noconfirm reflector rsync
 iso=$(curl -4 ifconfig.co/country-iso)
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
+echo "--------------------------------------"
+echo "-- Arch Install Initramfs           --"
+echo "--------------------------------------"
+sed -i 's/HOOKS=.*/HOOKS=(base keyboard udev autodetect modconf block keymap encrypt btrfs filesystems)/g' /etc/mkinitcpio.conf
+mkinitcpio -p linux #Recreate initramfs
+
 nc=$(grep -c ^processor /proc/cpuinfo)
 echo "You have " $nc" cores."
 echo "-------------------------------------------------"
