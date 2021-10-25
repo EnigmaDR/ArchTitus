@@ -61,7 +61,7 @@ cp -r $HOME/ArchTitus/dotfiles/* $HOME/.config/
 pip install konsave
 konsave -i $HOME/ArchTitus/kde.knsv
 sleep 1
-konsave -a kde
+#konsave -a kde
 setxkbmap -layout no
 
 echo -e "\nDone!\n"
