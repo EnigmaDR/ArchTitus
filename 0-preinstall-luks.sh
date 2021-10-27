@@ -7,7 +7,7 @@
 #  ██║  ██║██║  ██║╚██████╗██║  ██║   ██║   ██║   ██║   ╚██████╔╝███████║
 #  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
 #-------------------------------------------------------------------------
-
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 echo "-------------------------------------------------"
 echo "Setting up mirrors for optimal download          "
 echo "-------------------------------------------------"
@@ -91,6 +91,12 @@ btrfs su cr /mnt/@tmp
 btrfs su cr /mnt/@.snapshots
 umount /mnt
 ;;
+*)
+echo "Rebooting in 3 Seconds ..." && sleep 1
+echo "Rebooting in 2 Seconds ..." && sleep 1
+echo "Rebooting in 1 Second ..." && sleep 1
+reboot now
+;;
 esac
 
 # mount target
@@ -101,9 +107,17 @@ mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@opt -L RO
 mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@tmp -L ROOT /mnt/tmp
 mount -t btrfs -o noatime,commit=120,compress=zstd,space_cache,subvol=@.snapshots -L ROOT /mnt/.snapshots
 mount -t btrfs -o subvol=@var -L ROOT /mnt/var
-#mkdir /mnt/boot
+mkdir /mnt/boot
 mkdir /mnt/boot/efi
 mount -t vfat -L UEFISYS /mnt/boot/
+
+if ! grep -qs '/mnt' /proc/mounts; then
+    echo "Drive is not mounted can not continue"
+    echo "Rebooting in 3 Seconds ..." && sleep 1
+    echo "Rebooting in 2 Seconds ..." && sleep 1
+    echo "Rebooting in 1 Second ..." && sleep 1
+    reboot now
+fi
 
 echo "--------------------------------------"
 echo "-- Arch Install on Main Drive       --"
@@ -131,6 +145,22 @@ options cryptdevice=UUID=${UUID}:luks:allow-discards root=/dev/mapper/luks rootf
 EOF
 cp -R ~/ArchTitus /mnt/root/
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
+echo "--------------------------------------"
+echo "-- Check for low memory systems <8G --"
+echo "--------------------------------------"
+TOTALMEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
+if [[  $TOTALMEM -lt 8000000 ]]; then
+    #Put swap into the actual system, not into RAM disk, otherwise there is no point in it, it'll cache RAM into RAM. So, /mnt/ everything.
+    mkdir /mnt/opt/swap #make a dir that we can apply NOCOW to to make it btrfs-friendly.
+    chattr +C /mnt/opt/swap #apply NOCOW, btrfs needs that.
+    dd if=/dev/zero of=/mnt/opt/swap/swapfile bs=1M count=2048 status=progress
+    chmod 600 /mnt/opt/swap/swapfile #set permissions.
+    chown root /mnt/opt/swap/swapfile
+    mkswap /mnt/opt/swap/swapfile
+    swapon /mnt/opt/swap/swapfile
+    #The line below is written to /mnt/ but doesn't contain /mnt/, since it's just / for the sysytem itself.
+    echo "/opt/swap/swapfile	none	swap	sw	0	0" >> /mnt/etc/fstab #Add swap to fstab, so it KEEPS working after installation.
+fi
 echo "--------------------------------------"
 echo "--   SYSTEM READY FOR 1-setup       --"
 echo "--------------------------------------"

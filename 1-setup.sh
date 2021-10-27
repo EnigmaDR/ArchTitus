@@ -30,10 +30,12 @@ nc=$(grep -c ^processor /proc/cpuinfo)
 echo "You have " $nc" cores."
 echo "-------------------------------------------------"
 echo "Changing the makeflags for "$nc" cores."
+TOTALMEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
+if [[  $TOTALMEM -gt 8000000 ]]; then
 sudo sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j$nc"/g' /etc/makepkg.conf
 echo "Changing the compression settings for "$nc" cores."
 sudo sed -i 's/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g' /etc/makepkg.conf
-
+fi
 echo "-------------------------------------------------"
 echo "       Setup Language and set locale       "
 echo "-------------------------------------------------"
@@ -55,7 +57,7 @@ localectl --no-ask-password set-locale LANG="en_US.UTF-8" LC_COLLATE="" LC_TIME=
 #read KM
 #localectl --no-ask-password set-keymap no-latin1
 #loadkeys no-latin1
-echo KEYMAP=no-latin1 > /etc/vconsole.conf
+echo KEYMAP=no-latin1 > /mnt/etc/vconsole.conf
 
 # Add sudo no password rights
 sed -i 's/^# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
@@ -70,6 +72,15 @@ pacman -Sy --noconfirm
 echo -e "\nInstalling Base System\n"
 
 PKGS=(
+'mesa' # Essential Xorg First
+'xorg'
+'xorg-server'
+'xorg-apps'
+'xorg-drivers'
+'xorg-xkill'
+'xorg-xinit'
+'xterm'
+'plasma-desktop' # KDE Load second
 'alsa-plugins' # audio plugins
 'alsa-utils' # audio utils
 'ark' # compression
@@ -93,19 +104,13 @@ PKGS=(
 'code' # Visual Studio code
 'cronie'
 'cups'
-'dhcpcd'
 'dialog'
 'discover'
-'dmidecode'
-'dnsmasq'
 'dolphin'
 'dosfstools'
-'drkonqi'
-'edk2-ovmf'
 'efibootmgr' # EFI boot
 'egl-wayland'
 'exfat-utils'
-'firefox'
 'flex'
 'fuse2'
 'fuse3'
@@ -116,7 +121,6 @@ PKGS=(
 'git'
 'gparted' # partition management
 'gptfdisk'
-'groff'
 'grub'
 'grub-customizer'
 'gst-libav'
@@ -126,45 +130,12 @@ PKGS=(
 'htop'
 'iptables-nft'
 'jdk-openjdk' # Java 17
-'kactivitymanagerd'
 'kate'
 'kvantum-qt5'
-'kcalc'
-'kcharselect'
-'kcron'
-'kde-cli-tools'
 'kde-gtk-config'
-'kdecoration'
-'kdenetwork-filesharing'
-'kdeplasma-addons'
-'kdesdk-thumbnailers'
-'kdialog'
-'keychain'
-'kfind'
-'kgamma5'
-'kgpg'
-'khotkeys'
-'kinfocenter'
 'kitty'
-'kmenuedit'
-'kmix'
 'konsole'
-'kscreen'
-'kscreenlocker'
-'ksshaskpass'
-'ksystemlog'
-'ksystemstats'
-'kwallet-pam'
-'kwalletmanager'
-'kwayland-integration'
-'kwayland-server'
-'kwin'
-'kwrite'
-'kwrited'
 'layer-shell-qt'
-'libguestfs'
-'libkscreen'
-'libksysguard'
 'libnewt'
 'libtool'
 'linux'
@@ -180,6 +151,7 @@ PKGS=(
 'neofetch'
 'networkmanager'
 'ntfs-3g'
+'ntp'
 'okular'
 'openbsd-netcat'
 'openssh'
@@ -190,21 +162,6 @@ PKGS=(
 'patch'
 'picom'
 'pkgconf'
-'plasma-browser-integration'
-'plasma-desktop'
-'plasma-disks'
-'plasma-firewall'
-'plasma-integration'
-'plasma-nm'
-'plasma-pa'
-'plasma-sdk'
-'plasma-systemmonitor'
-'plasma-thunderbolt'
-'plasma-vault'
-'plasma-workspace'
-'plasma-workspace-wallpapers'
-'polkit-kde-agent'
-'powerdevil'
 'powerline-fonts'
 'print-manager'
 'pulseaudio'
@@ -223,13 +180,11 @@ PKGS=(
 'synergy'
 'systemsettings'
 'terminus-font'
-'texinfo'
 'traceroute'
 'ufw'
 'unrar'
 'unzip'
 'usbutils'
-'vde2'
 'vim'
 'virt-manager'
 'virt-viewer'
@@ -240,9 +195,6 @@ PKGS=(
 'winetricks'
 'xdg-desktop-portal-kde'
 'xdg-user-dirs'
-'xorg'
-'xorg-server'
-'xorg-xinit'
 'zeroconf-ioslave'
 'zip'
 'zsh'
@@ -293,6 +245,8 @@ then
 	passwd $username
 	cp -R /root/ArchTitus /home/$username/
     chown -R $username: /home/$username/ArchTitus
+	read -p "Please name your machine:" nameofmachine
+	echo $nameofmachine > /etc/hostname
 else
 	echo "You are already a user proceed with aur installs"
 fi
