@@ -28,11 +28,12 @@ EOF
 echo -e "\nEnabling the cups service daemon so we can print"
 
 systemctl enable cups.service
-sudo ntpd -qg
-sudo systemctl enable ntpd.service
-sudo systemctl disable dhcpcd.service
-sudo systemctl stop dhcpcd.service
-sudo systemctl enable NetworkManager.service
+ntpd -qg
+systemctl enable ntpd.service
+systemctl disable dhcpcd.service
+systemctl stop dhcpcd.service
+systemctl enable NetworkManager.service
+systemctl enable bluetooth
 echo "
 ###############################################################################
 # Cleaning

@@ -32,9 +32,11 @@ echo "-------------------------------------------------"
 echo "Changing the makeflags for "$nc" cores."
 TOTALMEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
 if [[  $TOTALMEM -gt 8000000 ]]; then
-sudo sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j$nc"/g' /etc/makepkg.conf
+#sudo sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j$nc"/g' /etc/makepkg.conf
+sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$nc\"/g" /etc/makepkg.conf
 echo "Changing the compression settings for "$nc" cores."
-sudo sed -i 's/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g' /etc/makepkg.conf
+#sudo sed -i 's/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g' /etc/makepkg.conf
+sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $nc -z -)/g" /etc/makepkg.conf
 fi
 echo "-------------------------------------------------"
 echo "       Setup Language and set locale       "
@@ -95,6 +97,7 @@ PKGS=(
 'bluedevil'
 'bluez'
 'bluez-libs'
+'bluez-utils'
 'breeze'
 'breeze-gtk'
 'bridge-utils'
@@ -108,9 +111,12 @@ PKGS=(
 'discover'
 'dolphin'
 'dosfstools'
+'dtc'
 'efibootmgr' # EFI boot
 'egl-wayland'
 'exfat-utils'
+'extra-cmake-modules'
+'filelight'
 'flex'
 'fuse2'
 'fuse3'
@@ -126,16 +132,23 @@ PKGS=(
 'gst-libav'
 'gst-plugins-good'
 'gst-plugins-ugly'
+'gwenview'
 'haveged'
 'htop'
 'iptables-nft'
 'jdk-openjdk' # Java 17
 'kate'
+'kcodecs'
+'kcoreaddons'
+'kdeplasma-addons'
+'kinfocenter'
 'kvantum-qt5'
 'kde-gtk-config'
 'kitty'
 'konsole'
+'kscreen'
 'layer-shell-qt'
+'libdvdcss'
 'libnewt'
 'libtool'
 'linux'
@@ -162,11 +175,18 @@ PKGS=(
 'patch'
 'picom'
 'pkgconf'
+'plasma-meta'
+'plasma-nm'
+'plasma-pa'
 'powerline-fonts'
+'powerdevil'
 'print-manager'
 'pulseaudio'
 'pulseaudio-alsa'
 'pulseaudio-bluetooth'
+'python-notify2'
+'python-psutil'
+'python-pyqt5'
 'python-pip'
 'qemu'
 'rsync'
